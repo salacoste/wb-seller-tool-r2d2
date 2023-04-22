@@ -18,7 +18,6 @@ export default async function handler(
     ('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6IjdlM2I5MjY5LWMyMGYtNDQ4OS1iZDYzLTYyMmUzZjkwMjRlYSJ9.pI_wUJqCg7sNYZh-EWV_sK7SLcqsLTvvGTM9-zFSbQ8' as unknown as string);
   const realizationreport_id = req.query
     .realizationreport_id as unknown as number;
-  console.log('ttt', realizationreport_id);
   const response: any = await WbModelReport.getReport(
     apiToken,
     startDate,

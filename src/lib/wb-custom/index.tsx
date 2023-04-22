@@ -36,17 +36,14 @@ export const WbModelReport: IWbModel = {
         error: (error as Error).message,
       };
     }
-    console.log('json', json);
 
     if (json === null) {
       return { error: 'Нет данных в ответе, проверьте заданные параметры' };
     }
     if (realizationreport_id) {
       json = json.filter((x: { [k: string]: string }) => {
-        console.log(x.realizationreport_id);
         return Number(x.realizationreport_id) === Number(realizationreport_id);
       });
-      console.log(222, json);
     }
 
     // if (json.length === 0) {
@@ -71,16 +68,19 @@ export const WbModelReport: IWbModel = {
         const obj: { [k: string]: string | number } = {};
         // console.log(item.sa_name);
         if (item.supplier_oper_name === 'Продажа') {
-          obj.total_sell_quantity = item.quantity;
-          obj.total_sell_rub = item.ppvz_for_pay;
-          obj.total_sell_before_commision = item.retail_price_withdisc_rub;
+          obj.total_sell_quantity = item.quantity || 0;
+          obj.total_sell_rub = item.ppvz_for_pay || 0;
+          obj.total_sell_before_commision = item.retail_price_withdisc_rub || 0;
           obj.total_delivery_rub = 0;
         }
         if (
           item.supplier_oper_name === 'Логистика' &&
           item.bonus_type_name === 'К клиенту при продаже'
         ) {
-          obj.total_delivery_rub = item.delivery_rub;
+          obj.total_delivery_rub = item.delivery_rub || 0;
+          obj.total_sell_quantity = item.quantity || 0;
+          obj.total_sell_rub = item.ppvz_for_pay || 0;
+          obj.total_sell_before_commision = item.retail_price_withdisc_rub || 0;
         }
         data.set(item.sa_name, {
           ...obj,
