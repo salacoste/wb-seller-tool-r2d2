@@ -31,7 +31,7 @@ export const WbModelReport: IWbModel = {
       });
       var json: {}[] = await response.json();
     } catch (error) {
-      console.log(error);
+      console.log('RESTApi request error happened', error);
       return {
         error: (error as Error).message,
       };
@@ -57,10 +57,12 @@ export const WbModelReport: IWbModel = {
     // await fs.writeFile('./data.xls', xls, () => {});
 
     const data = new Map();
+    const nonSalesData: {}[] = [];
     // console.log(json);
     json.forEach((item: { [k: string]: string | number }, i) => {
       if (!(item.doc_type_name === 'Продажа')) {
         console.log(`есть запись НЕ Продажа, а ${item.doc_type_name}`);
+        nonSalesData.push(item);
         return false;
       }
 
@@ -70,6 +72,7 @@ export const WbModelReport: IWbModel = {
         if (item.supplier_oper_name === 'Продажа') {
           obj.total_sell_quantity = item.quantity || 0;
           obj.total_sell_rub = item.ppvz_for_pay || 0;
+          obj.total_sell_rub_description = `Сумма с учетом комиссий WB, но без учета расхода на доставки`;
           obj.total_sell_before_commision = item.retail_price_withdisc_rub || 0;
           obj.total_delivery_rub = 0;
         }
@@ -80,6 +83,7 @@ export const WbModelReport: IWbModel = {
           obj.total_delivery_rub = item.delivery_rub || 0;
           obj.total_sell_quantity = item.quantity || 0;
           obj.total_sell_rub = item.ppvz_for_pay || 0;
+          obj.total_sell_rub_description = `Сумма с учетом комиссий WB, но без учета расхода на доставки`;
           obj.total_sell_before_commision = item.retail_price_withdisc_rub || 0;
         }
         data.set(item.sa_name, {
@@ -100,7 +104,6 @@ export const WbModelReport: IWbModel = {
           item.bonus_type_name === 'К клиенту при продаже'
         ) {
           obj.total_delivery_rub += Number(item.delivery_rub);
-          //   console.log(222, obj.total_delivery_rub);
         }
         data.set(item.sa_name, {
           ...obj,
@@ -111,7 +114,31 @@ export const WbModelReport: IWbModel = {
       }
     });
 
-    return await Object.fromEntries(data);
+    if (nonSalesData.length > 0) {
+      let ws2 = xlsx.utils.json_to_sheet(nonSalesData);
+      let wb2 = xlsx.utils.book_new();
+      xlsx.utils.book_append_sheet(wb2, ws2, 'Non Sales data');
+      xlsx.writeFile(wb, './data_nonsales.xlsx');
+    }
+
+    let result = Object.fromEntries(data);
+
+    for (const key in result) {
+      if (Object.prototype.hasOwnProperty.call(result, key)) {
+        const element = result[key];
+        for (const key2 in element) {
+          if (Object.prototype.hasOwnProperty.call(element, key2)) {
+            let element2 = element[key2];
+            if (typeof element2 === 'number') {
+              element[key2] = element2.toFixed(2);
+              //   console.log(element[key2]);
+            }
+          }
+        }
+      }
+    }
+
+    return await result;
   },
 };
 
