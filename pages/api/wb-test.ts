@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { WbModelReport } from '@/lib/wb-custom/index';
+import xlsx, { read, writeFileXLSX } from 'xlsx';
 
 type Data = {
   data: { [k: string]: string | number };
@@ -46,9 +47,11 @@ export default async function handler(
       100
     ).toFixed(2);
     item.the_most_clear_money = (
-      item.total_sell_rub - item.total_delivery_rub
+      item.total_sell_rub -
+      item.total_delivery_rub -
+      item.acceptance_rub
     ).toFixed(2);
-    item.the_most_clear_money_description = `Рубли с вычетом всех комиссий и доставок (пока без учета оплат возвратов)`;
+    item.the_most_clear_money_description = `Рубли с вычетом всех комиссий WB, доставок к покупатели, возвратов, платной приемки (пока без учета оплат возвратов - когда забирает с ПВЗ, а потом возвращает в течении 14 дней)`;
 
     _item_numbers_over_period += 1;
     clear_sales_over_period += Number(item.total_sell_rub);
@@ -60,6 +63,23 @@ export default async function handler(
     the_most_clear_money_over_period += Number(item.the_most_clear_money);
     average_commision_percent_over_period += Number(item.commision_percents);
   });
+
+  console.log(3331, response);
+
+  if (typeof response === 'object') {
+    const r = [];
+    for (const key in response) {
+      if (Object.prototype.hasOwnProperty.call(response, key)) {
+        const element = response[key];
+        r.push(element);
+      }
+    }
+    let ws2 = xlsx.utils.json_to_sheet(r);
+    let wb2 = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb2, ws2, 'Summary Report');
+    xlsx.writeFile(wb2, './data_wb_test.xlsx');
+  }
+
   res.status(200).json({
     data: response,
     totalData: {
