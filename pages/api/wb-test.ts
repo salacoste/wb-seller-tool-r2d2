@@ -64,8 +64,6 @@ export default async function handler(
     average_commision_percent_over_period += Number(item.commision_percents);
   });
 
-  console.log(3331, response);
-
   if (typeof response === 'object') {
     const r = [];
     for (const key in response) {
