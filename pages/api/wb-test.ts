@@ -13,8 +13,8 @@ export default async function handler(
   res: NextApiResponse<Data>,
 ) {
   const srid = (req.query.srid as unknown as number) || 0;
-  const startDate = '2023-02-01';
-  const endDate = '2023-04-23';
+  const startDate = '2023-01-01';
+  const endDate = '2023-04-24';
   const apiToken =
     (req.query.api_token as unknown as string) ||
     (process.env.WB_TOKEN as unknown as string);
@@ -29,8 +29,15 @@ export default async function handler(
     realizationreport_id,
   );
 
+  if (response.error || response.errors) {
+    res.status(200).json(response);
+    return;
+  }
+
   let clear_sales_over_period: number = 0;
   let delivery_over_period: number = 0;
+  let total_lost_items_over_period: number = 0;
+
   let sales_with_commision_over_period: number = 0;
   let total_quantity_over_period: number = 0;
   let the_most_clear_money_over_period: number = 0;
@@ -55,6 +62,7 @@ export default async function handler(
 
     _item_numbers_over_period += 1;
     clear_sales_over_period += Number(item.total_sell_rub);
+    total_lost_items_over_period += Number(item.lost_items);
     sales_with_commision_over_period += Number(
       item.total_sell_before_commision,
     );
@@ -82,6 +90,7 @@ export default async function handler(
     data: response,
     totalData: {
       total_quantity_over_period,
+      total_lost_items_over_period: total_lost_items_over_period.toFixed(0),
       the_most_clear_money_over_period:
         the_most_clear_money_over_period.toFixed(2),
       clear_sales_over_period: clear_sales_over_period.toFixed(2),

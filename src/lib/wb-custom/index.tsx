@@ -45,7 +45,9 @@ export const WbModelReport: IWbModel = {
       let response = await fetch(url, {
         headers: { Authorization: `Bearer ${apiToken}` },
       });
-      var json: {}[] = await response.json();
+      type JS1 = { [k: string]: string | number | object }[];
+      type JS2 = { errors: any };
+      var json: JS1 = await response.json();
     } catch (error) {
       console.log('RESTApi request error happened', error);
       return {
@@ -56,15 +58,27 @@ export const WbModelReport: IWbModel = {
     if (json === null) {
       return { error: 'Нет данных в ответе, проверьте заданные параметры' };
     }
+    if ('errors' in json) {
+      if (json?.errors) {
+        return { error: 'Нет данных в ответе, проверьте заданные параметры' };
+      }
+    }
+
     if (realizationreport_id) {
-      json = json.filter((x: { [k: string]: string }) => {
-        return Number(x.realizationreport_id) === Number(realizationreport_id);
-      });
+      if (json instanceof Array) {
+        json = json.filter((x) => {
+          return (
+            Number(x.realizationreport_id) === Number(realizationreport_id)
+          );
+        });
+      }
     }
 
     // if (json.length === 0) {
     //   return Object.fromEntries(new Map());
     // }
+    // console.log(1111, json);
+
     let ws = xlsx.utils.json_to_sheet(json || {});
     let wb = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, ws, 'Sales data');
@@ -74,60 +88,103 @@ export const WbModelReport: IWbModel = {
 
     const data = new Map();
     const nonSalesData: {}[] = [];
-    // console.log(json);
-    json.forEach((item: { [k: string]: string | number }, i) => {
+
+    json.forEach((item: { [k: string]: string | number | object }, i) => {
+      // console.log(i, item.quantity, typeof item.quantity);
       if (!(item.doc_type_name === 'Продажа')) {
         console.log(`есть запись НЕ Продажа, а ${item.doc_type_name}`);
         nonSalesData.push(item);
         return false;
       }
 
-      if (!data.has(item.sa_name)) {
-        const obj: { [k: string]: string | number } = {};
-        // console.log(item.sa_name);
-        if (item.supplier_oper_name === 'Продажа') {
-          obj.total_sell_quantity = item.quantity || 0;
-          obj.total_sell_rub = item.ppvz_for_pay || 0;
-          obj.total_sell_rub_description = `Сумма с учетом комиссий WB, но без учета расхода на доставки и приемки`;
-          obj.total_sell_before_commision = item.retail_price_withdisc_rub || 0;
-          obj.total_delivery_rub = 0;
+      if (item.doc_type_name === 'Продажа') {
+        // console.log(`все еще здесь записи, а ${item.doc_type_name}`);
+        if (!data.has(item.sa_name)) {
+          const obj: { [k: string]: string | number | object } = {};
+          // console.log(item.sa_name);
+          if (item.supplier_oper_name === 'Продажа') {
+            obj.total_sell_quantity = Number(item.quantity) || 0;
+            obj.total_sell_rub = Number(item.ppvz_for_pay) || 0;
+            obj.total_sell_rub_description = `Сумма с учетом комиссий WB, но без учета расхода на доставки и платной приемки`;
+            obj.total_sell_before_commision =
+              Number(item.retail_price_withdisc_rub) || 0;
+            obj.total_delivery_rub = 0;
+          }
+          if (
+            item.supplier_oper_name === 'Логистика' &&
+            item.bonus_type_name === 'К клиенту при продаже'
+          ) {
+            obj.total_delivery_rub = Number(item.delivery_rub) || 0;
+            obj.total_sell_quantity = Number(item.quantity) || 0;
+            obj.total_sell_rub = Number(item.ppvz_for_pay) || 0;
+            obj.total_sell_rub_description = `Сумма с учетом комиссий WB, но без учета расхода на доставки и платной приемки`;
+            obj.total_sell_before_commision =
+              Number(item.retail_price_withdisc_rub) || 0;
+          }
+          if (item.supplier_oper_name === 'Оплата потерянного товара') {
+            obj.total_sell_quantity = Number(item.quantity) || 0;
+            obj.total_sell_rub = Number(item.ppvz_for_pay) || 0;
+            obj.total_sell_rub_description = `Сумма с учетом комиссий WB, но без учета расхода на доставки и платной приемки`;
+            obj.total_sell_before_commision =
+              Number(item.retail_price_withdisc_rub) || 0;
+            obj.total_delivery_rub = Number(item.delivery_rub) || 0;
+            obj.lost_items = Number(item.quantity) || 0;
+          }
+          data.set(item.sa_name, {
+            ...obj,
+            id: item.barcode,
+            nm_id: item.nm_id.toString(),
+            article: item.sa_name,
+            name: item.subject_name,
+            lost_items: obj.lost_items || 0,
+            lost_items_description: `Потерянные товары по которым совершена операция Тип Оплата: Оплата потерянного товара. Это кол-во уже включено в общее поле quantity вместе с проданными товарами.`,
+          });
+        } else {
+          const obj = data.get(item.sa_name);
+          // console.log(
+          //   item.quantity,
+          //   typeof item.quantity,
+          //   obj.total_sell_quantity,
+          //   typeof obj.total_sell_quantity,
+          // );
+          // if (isNaN(obj.total_sell_quantity)) {
+          //   console.log(11, obj, item);
+          //   console.log(11, json[i - 1]);
+          // }
+
+          if (item.supplier_oper_name === 'Продажа') {
+            obj.total_sell_quantity += Number(item.quantity);
+
+            obj.total_sell_rub += Number(item.ppvz_for_pay);
+            obj.total_sell_before_commision += Number(
+              item.retail_price_withdisc_rub,
+            );
+          }
+          if (
+            item.supplier_oper_name === 'Логистика' &&
+            item.bonus_type_name === 'К клиенту при продаже'
+          ) {
+            obj.total_delivery_rub += Number(item.delivery_rub);
+          }
+          if (item.supplier_oper_name === 'Оплата потерянного товара') {
+            obj.total_sell_quantity += Number(item.quantity) || 0;
+            obj.total_sell_rub += Number(item.ppvz_for_pay) || 0;
+            obj.total_sell_rub_description = `Сумма с учетом комиссий WB, но без учета расхода на доставки и платной приемки`;
+            obj.total_sell_before_commision +=
+              Number(item.retail_price_withdisc_rub) || 0;
+            obj.total_delivery_rub = +Number(item.delivery_rub) || 0;
+            obj.lost_items += Number(item.quantity) || 0;
+          }
+
+          data.set(item.sa_name, {
+            ...obj,
+            id: item.sa_name,
+            name: item.subject_name,
+            article: item.sa_name,
+            lost_items: obj.lost_items || 0,
+            lost_items_description: `Потерянные товары по которым совершена операция Тип Оплата: Оплата потерянного товара. Это кол-во уже включено в общее поле quantity вместе с проданными товарами.`,
+          });
         }
-        if (
-          item.supplier_oper_name === 'Логистика' &&
-          item.bonus_type_name === 'К клиенту при продаже'
-        ) {
-          obj.total_delivery_rub = item.delivery_rub || 0;
-          obj.total_sell_quantity = item.quantity || 0;
-          obj.total_sell_rub = item.ppvz_for_pay || 0;
-          obj.total_sell_rub_description = `Сумма с учетом комиссий WB, но без учета расхода на доставки и приемки`;
-          obj.total_sell_before_commision = item.retail_price_withdisc_rub || 0;
-        }
-        data.set(item.sa_name, {
-          ...obj,
-          id: item.barcode,
-          nm_id: item.nm_id.toString(),
-          article: item.sa_name,
-          name: item.subject_name,
-        });
-      } else {
-        const obj = data.get(item.sa_name);
-        if (item.supplier_oper_name === 'Продажа') {
-          obj.total_sell_quantity += item.quantity;
-          obj.total_sell_rub += item.ppvz_for_pay;
-          obj.total_sell_before_commision += item.retail_price_withdisc_rub;
-        }
-        if (
-          item.supplier_oper_name === 'Логистика' &&
-          item.bonus_type_name === 'К клиенту при продаже'
-        ) {
-          obj.total_delivery_rub += Number(item.delivery_rub);
-        }
-        data.set(item.sa_name, {
-          ...obj,
-          id: item.sa_name,
-          name: item.subject_name,
-          article: item.sa_name,
-        });
       }
     });
 

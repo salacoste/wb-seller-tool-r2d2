@@ -45,8 +45,8 @@ export default async function handler(
                 if (obj) {
                   response.set(`${element.nmId}`, {
                     nmId: element.nmId,
-                    count: element.count + obj.count,
-                    sum: element.sum + obj.sum,
+                    count: Number(element.count + obj.count),
+                    sum: Number(element.sum + obj.sum),
                   });
                 } else {
                   response.set(`${element.nmId}`, element);
