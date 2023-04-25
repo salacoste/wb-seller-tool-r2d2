@@ -1,0 +1,13 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    container_name: wb_tools_r2d2_db
+    # restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      # MYSQL_DATABASE: wb_tools_r2d2
+    volumes:
+      - ./mysql_dump.sql:/docker-entrypoint-initdb.d/mysql_dump.sql
+    ports:
+      - '3306:3306'

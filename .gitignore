@@ -9,6 +9,9 @@
 *.xls*
 data.json
 
+# docker 
+/docker/docker/*
+
 # testing
 /coverage
 

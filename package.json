@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prisma:init": "yarn prisma:pull && yarn prisma:generate && yarn prisma:seed",
+    "prisma:init-push": "yarn prisma:pull && yarn prisma:generate && yarn prisma:seed",
     "prisma:pull": "npx prisma db pull",
     "prisma:seed": "npx prisma db seed",
     "prisma:generate": "npx prisma generate",
