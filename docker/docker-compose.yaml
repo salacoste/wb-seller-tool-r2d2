@@ -7,7 +7,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       # MYSQL_DATABASE: wb_tools_r2d2
+    networks:
+      - default
+      - specific-network-name
     volumes:
       - ./mysql_dump.sql:/docker-entrypoint-initdb.d/mysql_dump.sql
     ports:
       - '3306:3306'
+networks:
+  specific-network-name:
+    external: false
+    name: specific-network-name
