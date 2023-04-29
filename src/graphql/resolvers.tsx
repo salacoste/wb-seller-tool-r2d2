@@ -2,6 +2,7 @@ import { Tool } from '@/lib/dump-data/types';
 import { prisma } from '@/lib/prisma/prismaClient';
 import tools from '../lib/dump-data/toolsData';
 import { IContext } from './types';
+import { randomUUID } from 'crypto';
 
 export const resolvers = {
   Query: {
@@ -30,6 +31,58 @@ export const resolvers = {
         where: { id: args.id },
       });
       return tools;
+    },
+    // AuthToken getters
+    getAuthTokens: async (
+      parent: unknown,
+      args: { id: string },
+      context: IContext,
+      info: {},
+    ) => {
+      return await context.prisma.authToken.findMany({});
+    },
+    getAuthToken: async (
+      parent: unknown,
+      args: { token: string },
+      context: IContext,
+      info: {},
+    ) => {
+      // console.log('token', args.token);
+      return await context.prisma.authToken.findUnique({
+        where: { token: args.token },
+      });
+    },
+    getUsers: async (
+      parent: unknown,
+      args: {},
+      context: IContext,
+      info: {},
+    ) => {
+      return await context.prisma.user.findMany({
+        include: { password: true },
+      });
+    },
+    getUser: async (
+      parent: unknown,
+      args: { id: string },
+      context: IContext,
+      info: {},
+    ) => {
+      return await context.prisma.user.findUnique({
+        where: { id: args.id },
+        include: { password: true },
+      });
+    },
+    getUserByEmail: async (
+      parent: unknown,
+      args: { email: string },
+      context: IContext,
+      info: {},
+    ) => {
+      return await context.prisma.user.findUnique({
+        where: { email: args.email },
+        include: { password: true, role: true },
+      });
     },
   },
   Mutation: {
@@ -90,6 +143,45 @@ export const resolvers = {
         },
       });
       return tool;
+    },
+    createUser: async (
+      parent: unknown,
+      args: {
+        name: string;
+        email: string;
+        password: string;
+        image?: string;
+        role: string;
+        roleDescription?: string;
+      },
+      context: IContext,
+      info: {},
+    ) => {
+      const user = await prisma.user.create({
+        data: {
+          name: args.name,
+          email: args.email,
+          image: args.image,
+          password: {
+            create: {
+              password: args.password,
+              //email: args.email,
+            },
+          },
+          role: {
+            create: {
+              name: args.name,
+              description: args.roleDescription,
+              id: randomUUID(),
+            },
+          },
+        },
+        include: {
+          password: true, // Return all fields
+          role: true,
+        },
+      });
+      return user;
     },
   },
 };
