@@ -11,13 +11,15 @@ export const seedUserData: IUserData[] = [
   {
     id: rUID,
     email: 'test@test.com',
-    name: 'admin',
+    name: 'Билл Гейтс',
+    image: 'https://i.ibb.co/k3WDBsP/avatar-01.png',
     roleId: '1',
   },
   {
     id: rUID2,
     email: 'user@test.com',
-    name: 'user',
+    name: 'Дэвид Коперфилд',
+    image: 'https://i.ibb.co/gVRdpPf/avatar-02.png',
     roleId: '2',
   },
 ];

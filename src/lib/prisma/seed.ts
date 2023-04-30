@@ -6,7 +6,7 @@ import {
   seedRolesData,
 } from '../dump-data/userPasswordData';
 
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 import { prisma } from './prismaClient';
 
@@ -65,6 +65,7 @@ const main = async () => {
           id: user.id,
           name: user.name,
           email: user.email,
+          image: user.image,
           // roleId: user.roleId as unknown as undefined,
           password: {
             connectOrCreate: {
@@ -93,6 +94,7 @@ const main = async () => {
           id: user.id,
           name: user.name,
           email: user.email,
+          image: user.image,
           // roleId: user.roleId as unknown as undefined,
           password: {
             connectOrCreate: {

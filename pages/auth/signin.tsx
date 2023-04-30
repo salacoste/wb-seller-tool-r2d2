@@ -11,6 +11,7 @@ import {
 } from 'next-auth/react';
 
 import { getCsrfToken } from 'next-auth/react';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { SetStateAction, useEffect, useState } from 'react';
 
@@ -26,9 +27,7 @@ export const SignIn = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [signInStatus, setSignInStatus] = useState<
-    SignInResponse | undefined
-  >();
+  const [signInStatus, setSignInStatus] = useState<any>();
 
   // const error = useRouter().query.error;
   const router = useRouter();
@@ -53,14 +52,11 @@ export const SignIn = ({
       password: { value: string };
     };
 
-    const a: SignInResponse | undefined = await signIn('credentials', {
+    const a: any = await signIn('credentials', {
       redirect: false,
       password,
       email,
     });
-
-    if (a?.status === 'error') {
-    }
 
     console.log('aaa', a);
 
@@ -79,66 +75,103 @@ export const SignIn = ({
   };
   return (
     // <div className="flex justify-center flex-col items-center h-screen card">
-    <div className="wrapper flex flex-1 flex-col justify-center min-h-screen  ">
-      <div className="card flex-shrink-0 w-full max-w-lg shadow-2xl   flex m-auto flex-col bg-slate-50">
-        <div className="card-body">
-          <h1 className="font-bold text-3xl text-blue-600">Sign In</h1>
-          <form
-            className="mt-4"
-            onSubmit={onSubmit}
-            action="/api/auth/callback/credentials"
-            method="post"
-          >
+    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <Image
+          src={'/wildberries.png'}
+          alt="Logo"
+          width={120}
+          height={30}
+          className="block m-auto"
+        />
+
+        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
+          Авторизация
+        </h2>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form
+          className="space-y-6"
+          onSubmit={onSubmit}
+          action="/api/auth/callback/credentials"
+          method="post"
+        >
+          <div>
             <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
-            <div className="form-control">
-              <label className="label" htmlFor="email">
-                <span className="label-text text-md">Email</span>
-              </label>
+
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium leading-6 text-white"
+            >
+              Электронная почта
+            </label>
+            <div className="mt-2">
               <input
-                type="text"
-                placeholder="email"
+                id="email"
                 name="email"
-                className="input input-bordered p-2"
+                type="email"
                 onChange={(e) => {
                   setEmail(e.target.value);
                 }}
+                autoComplete="email"
+                required
+                className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
               />
             </div>
+          </div>
 
-            <div className="form-control mt-2 mb-2">
-              <label className="label">
-                <span className="label-text text-md">Password</span>
+          <div>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium leading-6 text-white"
+              >
+                Password
               </label>
+            </div>
+            <div className="mt-2">
               <input
-                type="password"
+                id="password"
                 name="password"
+                type="password"
                 onChange={(e) => {
                   setPassword(e.target.value);
                 }}
-                placeholder="Пароль"
-                className="input input-bordered p-2"
+                autoComplete="current-password"
+                required
+                className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
               />
             </div>
-
-            {error && (
-              <div className="form-control mt-2 mb-2 text-red-600 font-light italic">
-                <span>
-                  {errorDictionary[error] ||
-                    (error && !signInStatus?.ok) ||
-                    (signInStatus.status === 'error' && signInStatus.message)}
-                </span>
-              </div>
-            )}
-            <div>
-              <button
-                type="submit"
-                className="btn-primary btn rounded-lg mt-4 mb-4"
-              >
-                Войти
-              </button>
+          </div>
+          {error && (
+            <div className="form-control mt-2 mb-2 text-red-600 font-light italic">
+              <span>
+                {errorDictionary[error] ||
+                  (error && !signInStatus?.ok) ||
+                  (signInStatus?.status === 'error' && signInStatus.message)}
+              </span>
             </div>
-          </form>
-        </div>
+          )}
+          <div>
+            <button
+              type="submit"
+              className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            >
+              Войти
+            </button>
+          </div>
+        </form>
+
+        <p className="mt-10 text-center text-sm text-gray-400">
+          Нет аккаунта?{' '}
+          <a
+            href="#"
+            className="font-semibold leading-6 text-indigo-400 hover:text-indigo-300"
+          >
+            Читай инструкцию как создать аккаунт
+          </a>
+        </p>
       </div>
     </div>
   );

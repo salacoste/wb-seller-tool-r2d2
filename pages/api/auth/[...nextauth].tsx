@@ -10,9 +10,9 @@ import { verifyPassword } from '@/lib/utils/bcrypt';
 
 import { apolloClient } from '@/lib/apollo/apollo';
 
-export let authOptions = {} as AuthOptions;
+// export let authOptions = {} as ;
 
-authOptions = {
+export let authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   // Configure one or more authentication providers
 
@@ -119,9 +119,13 @@ authOptions = {
       session.user = token.user;
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, trigger, session, user }) {
       if (user) {
         token.user = user;
+      }
+      if (trigger === 'update' && session?.name) {
+        // Note, that `session` can be any arbitrary object, remember to validate it!
+        token.name = session;
       }
       return token;
     },
