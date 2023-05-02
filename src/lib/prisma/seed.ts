@@ -1,5 +1,6 @@
 import tools from '../dump-data/toolsData';
 import { seedAuthTokenData } from '../dump-data/authTokenData';
+import { seedCompanyData } from '../dump-data/companyData';
 import {
   seedUserData,
   seedPasswordData,
@@ -43,6 +44,31 @@ const main = async () => {
   });
   console.log(`AuthToken table was seeded.`);
 
+  console.log(`Start seeding Company Data...`);
+  await prisma.company.deleteMany({});
+  console.log(`Table User was wiped out. Ready to seeding it up.`);
+
+  seedCompanyData.forEach(async (company, i) => {
+    try {
+      await prisma.company.upsert({
+        include: {
+          users: true,
+        },
+        where: {
+          id: company.id,
+        },
+        create: {
+          ...company,
+        },
+        update: {
+          ...company,
+        },
+      });
+    } catch (error) {}
+  });
+
+  console.log(`Company table was seeded.`);
+
   console.log(`Start seeding User Data...`);
   await prisma.user.deleteMany({});
   console.log(`Table User was wiped out. Ready to seeding it up.`);
@@ -57,6 +83,7 @@ const main = async () => {
         include: {
           password: true,
           role: true,
+          company: true,
         },
         where: {
           id: user.id,
@@ -66,6 +93,17 @@ const main = async () => {
           name: user.name,
           email: user.email,
           image: user.image,
+          // companyId: user.companyId,
+          company: {
+            connectOrCreate: {
+              create: {
+                ...seedCompanyData[0],
+              },
+              where: {
+                id: user.companyId,
+              },
+            },
+          },
           // roleId: user.roleId as unknown as undefined,
           password: {
             connectOrCreate: {
@@ -95,7 +133,18 @@ const main = async () => {
           name: user.name,
           email: user.email,
           image: user.image,
+          // companyId: user.companyId,
           // roleId: user.roleId as unknown as undefined,
+          company: {
+            connectOrCreate: {
+              create: {
+                ...seedCompanyData[0],
+              },
+              where: {
+                id: user.companyId,
+              },
+            },
+          },
           password: {
             connectOrCreate: {
               create: {

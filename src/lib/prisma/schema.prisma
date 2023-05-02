@@ -82,8 +82,25 @@ model User {
   accounts      Account[]
   sessions      Session[]
   password      Password?
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId     String
   role          Role      @relation(fields: [roleId], references: [id])
   roleId        String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model Company {
+  id                  String   @id @default(cuid())
+  name                String?  @unique
+  description         String
+  users               User[]
+  WILDAUTHNEWV3       String
+  WBTOKEN             String
+  BasketUID           String
+  XSupplierId         String
+  XSupplierIdExternal String
+  WB_TOKEN            String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }

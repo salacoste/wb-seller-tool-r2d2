@@ -19,6 +19,19 @@ export declare interface IUserData {
   name: string;
   image?: string;
   roleId: string;
+  companyId: string;
+}
+
+export declare interface ICompanyData {
+  id: string;
+  name: string;
+  description: string;
+  WILDAUTHNEWV3: string;
+  WBTOKEN: string;
+  BasketUID: string;
+  XSupplierId: string;
+  XSupplierIdExternal: string;
+  WB_TOKEN: string;
 }
 
 export declare interface IUserPassword {

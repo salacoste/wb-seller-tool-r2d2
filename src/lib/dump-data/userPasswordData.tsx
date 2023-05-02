@@ -1,8 +1,9 @@
 import { IRole, IUserData, IUserPassword } from './types';
 import { randomUUID } from 'crypto';
+import { rUID as companyrUID, rUID2 as companyrUID2 } from './companyData';
 
-const rUID = randomUUID();
-const rUID2 = randomUUID();
+export const rUID = randomUUID();
+export const rUID2 = randomUUID();
 
 const saltRounds = 10;
 const hashPassword = async (password: string) => {};
@@ -14,6 +15,7 @@ export const seedUserData: IUserData[] = [
     name: 'Билл Гейтс',
     image: 'https://i.ibb.co/k3WDBsP/avatar-01.png',
     roleId: '1',
+    companyId: companyrUID,
   },
   {
     id: rUID2,
@@ -21,6 +23,7 @@ export const seedUserData: IUserData[] = [
     name: 'Дэвид Коперфилд',
     image: 'https://i.ibb.co/gVRdpPf/avatar-02.png',
     roleId: '2',
+    companyId: companyrUID,
   },
 ];
 
