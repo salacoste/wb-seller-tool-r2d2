@@ -46,28 +46,47 @@ const main = async () => {
 
   console.log(`Start seeding Company Data...`);
   await prisma.company.deleteMany({});
-  console.log(`Table User was wiped out. Ready to seeding it up.`);
+  console.log(`Table Company was wiped out. Ready to seeding it up.`);
 
-  seedCompanyData.forEach(async (company, i) => {
+  await seedCompanyData.forEach(async (company, i) => {
     try {
       await prisma.company.upsert({
-        include: {
-          users: true,
-        },
         where: {
           id: company.id,
         },
         create: {
-          ...company,
+          id: company.id,
+          name: company.name,
+          description: company.description,
+          WILDAUTHNEWV3: company.WILDAUTHNEWV3,
+          WBTOKEN: company.WBTOKEN,
+          BasketUID: company.BasketUID,
+          XSupplierId: company.XSupplierId,
+          XSupplierIdExternal: company.XSupplierIdExternal,
+          WB_TOKEN: company.WB_TOKEN,
+          seeded: company.seeded,
         },
         update: {
-          ...company,
+          id: company.id,
+          name: company.name,
+          description: company.description,
+          WILDAUTHNEWV3: company.WILDAUTHNEWV3,
+          WBTOKEN: company.WBTOKEN,
+          BasketUID: company.BasketUID,
+          XSupplierId: company.XSupplierId,
+          XSupplierIdExternal: company.XSupplierIdExternal,
+          WB_TOKEN: company.WB_TOKEN,
+          seeded: company.seeded,
         },
       });
-    } catch (error) {}
+      console.info(412, await prisma.company.findMany({}));
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   console.log(`Company table was seeded.`);
+  console.info(11, await prisma.company.findMany({}));
 
   console.log(`Start seeding User Data...`);
   await prisma.user.deleteMany({});
@@ -93,15 +112,9 @@ const main = async () => {
           name: user.name,
           email: user.email,
           image: user.image,
-          // companyId: user.companyId,
           company: {
-            connectOrCreate: {
-              create: {
-                ...seedCompanyData[0],
-              },
-              where: {
-                id: user.companyId,
-              },
+            connect: {
+              id: user.companyId,
             },
           },
           // roleId: user.roleId as unknown as undefined,

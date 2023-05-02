@@ -9,6 +9,7 @@ import { getServerSession, Session } from 'next-auth';
 import Link from 'next/link';
 import { authOptions } from './api/auth/[...nextauth]';
 import Navbar from '@/components/navbar/Navbar';
+import { useMemo } from 'react';
 
 export default function App(props: { session: string }) {
   // NextAuth session custom webhook data

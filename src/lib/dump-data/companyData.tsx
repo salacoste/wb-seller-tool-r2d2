@@ -18,6 +18,7 @@ export const seedCompanyData: ICompanyData[] = [
     XSupplierId: 'asdsa',
     XSupplierIdExternal: 'totoror',
     WB_TOKEN: 'asd223qgqk',
+    seeded: true,
   },
   {
     id: rUID2,
@@ -29,5 +30,6 @@ export const seedCompanyData: ICompanyData[] = [
     XSupplierId: 'asoqwlfm',
     XSupplierIdExternal: 'rowoqwe',
     WB_TOKEN: 'qosoc11oaoco',
+    seeded: true,
   },
 ];

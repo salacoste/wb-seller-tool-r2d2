@@ -32,6 +32,7 @@ export declare interface ICompanyData {
   XSupplierId: string;
   XSupplierIdExternal: string;
   WB_TOKEN: string;
+  seeded: boolean;
 }
 
 export declare interface IUserPassword {

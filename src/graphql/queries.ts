@@ -29,6 +29,20 @@ export const getUsers = gql`
         createdAt
         updatedAt
       }
+      company {
+        id
+        name
+        description
+        WILDAUTHNEWV3
+        WBTOKEN
+        BasketUID
+        XSupplierId
+        XSupplierIdExternal
+        WB_TOKEN
+        seeded
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
     }
@@ -50,6 +64,20 @@ export const getUser = gql`
         createdAt
         updatedAt
       }
+      company {
+        id
+        name
+        description
+        WILDAUTHNEWV3
+        WBTOKEN
+        BasketUID
+        XSupplierId
+        XSupplierIdExternal
+        WB_TOKEN
+        seeded
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
     }
@@ -64,6 +92,21 @@ export const getUserByEmail = gql`
       email
       emailVerified
       image
+      company {
+        id
+        name
+        description
+        WILDAUTHNEWV3
+        WBTOKEN
+        BasketUID
+        XSupplierId
+        XSupplierIdExternal
+        WB_TOKEN
+        seeded
+        createdAt
+        updatedAt
+      }
+      companyId
       password {
         password
         userId
@@ -74,7 +117,6 @@ export const getUserByEmail = gql`
         id
         name
         description
-
         createdAt
         updatedAt
       }

@@ -32,12 +32,30 @@ export const typeDefs = gql`
     updatedAt: String
   }
 
+  type Company {
+    id: String
+    name: String
+    description: String
+    users: [User]
+    WILDAUTHNEWV3: String
+    WBTOKEN: String
+    BasketUID: String
+    XSupplierId: String
+    XSupplierIdExternal: String
+    WB_TOKEN: String
+    seeded: Boolean
+    createdAt: String
+    updatedAt: String
+  }
+
   type User {
     id: String
     name: String
     email: String
     emailVerified: String
     image: String
+    company: Company!
+    companyId: String
     accounts: [String]
     sessions: [String]
     password: Password!

@@ -62,6 +62,7 @@ export let authOptions: AuthOptions = {
             query: getUserByEmail,
             variables: { email: credentials?.email },
           });
+          console.info(444, userData);
 
           // console.log(
           //   'cccc',
@@ -94,6 +95,8 @@ export let authOptions: AuthOptions = {
               image: userData.getUserByEmail.image,
               roleId: userData.getUserByEmail.role.id,
               roleName: userData.getUserByEmail.role.name,
+              company: userData.getUserByEmail.company,
+              seeded: userData.getUserByEmail.seeded,
             };
             // return userData.getUserByEmail;
           } else {
@@ -103,7 +106,7 @@ export let authOptions: AuthOptions = {
             // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
           }
         } catch (error: any) {
-          console.log(22, error);
+          console.log(22, error, error.networkError.result);
           return null;
           // return { status: 'error', ok: false, message: error?.message };
         }

@@ -59,7 +59,7 @@ export const resolvers = {
       info: {},
     ) => {
       return await context.prisma.user.findMany({
-        include: { password: true },
+        include: { password: true, company: true, role: true },
       });
     },
     getUser: async (
@@ -70,7 +70,7 @@ export const resolvers = {
     ) => {
       return await context.prisma.user.findUnique({
         where: { id: args.id },
-        include: { password: true },
+        include: { password: true, company: true, role: true },
       });
     },
     getUserByEmail: async (
@@ -81,7 +81,7 @@ export const resolvers = {
     ) => {
       return await context.prisma.user.findUnique({
         where: { email: args.email },
-        include: { password: true, role: true },
+        include: { password: true, company: true, role: true },
       });
     },
   },
@@ -153,6 +153,7 @@ export const resolvers = {
         image?: string;
         role: string;
         roleDescription?: string;
+        companyId: string;
       },
       context: IContext,
       info: {},
@@ -166,6 +167,11 @@ export const resolvers = {
             create: {
               password: args.password,
               //email: args.email,
+            },
+          },
+          company: {
+            connect: {
+              id: args.companyId,
             },
           },
           role: {

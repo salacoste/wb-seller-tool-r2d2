@@ -47,7 +47,7 @@ export const Navbar = (props: any) => {
   // console.log('dd', dataUser);
 
   let session = useSession();
-  console.log(22, session);
+  console.log(1234, session);
   let user = {
     email: session.data?.user?.email,
     name: session.data?.user?.name,
