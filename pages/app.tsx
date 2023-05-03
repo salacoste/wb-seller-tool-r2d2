@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { authOptions } from './api/auth/[...nextauth]';
 import Navbar from '@/components/navbar/Navbar';
 import { useMemo } from 'react';
+import WbCredsForm from '@/components/wbCreds/WbCredsForm';
 
 export default function App(props: { session: string }) {
   // NextAuth session custom webhook data
@@ -61,6 +62,7 @@ export default function App(props: { session: string }) {
         <main className="-mt-32">
           <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
             {/* Your content */}
+            <WbCredsForm />
           </div>
         </main>
       </div>
