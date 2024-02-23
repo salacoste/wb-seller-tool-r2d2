@@ -50,7 +50,7 @@
     "@types/react-dom": "18.0.11",
     "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",
-    "eslint": "8.38.0",
+    "eslint": "8.57.0",
     "eslint-config-next": "13.3.0",
     "graphql": "^16.6.0",
     "graphql-request": "^6.0.0",
